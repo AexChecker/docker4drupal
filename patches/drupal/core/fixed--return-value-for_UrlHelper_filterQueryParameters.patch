@@ -1,0 +1,16 @@
+Index: core/lib/Drupal/Component/Utility/UrlHelper.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/lib/Drupal/Component/Utility/UrlHelper.php	(revision 5f3b780547d74378cc8fc40ff0b68e3a09dd38fb)
++++ core/lib/Drupal/Component/Utility/UrlHelper.php	(revision )
+@@ -76,7 +76,7 @@
+    * @param string $parent
+    *   Internal use only. Used to build the $query array key for nested items.
+    *
+-   * @return
++   * @return array
+    *   An array containing query parameters.
+    */
+   public static function filterQueryParameters(array $query, array $exclude = array(), $parent = '') {

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+clear
+
+set -eo pipefail
+
+if [ ! -f "index.php" ]; then
+  echo 'Please run this script from "drupal8" directory.'
+  exit 1;
+fi
+
+$(echo $(pwd)"/scripts/project-branch");
+
+DOCKER=$(realpath "$(pwd)/../ci");
+DOCKER_YML="$DOCKER/docker-compose.yml";
+PROJECT="$(cat "./.project-name" | tr -d '[:space:]')";
+
+docker-compose -f $DOCKER_YML -p $PROJECT stop;

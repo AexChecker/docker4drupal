@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [ ! -f "node_modules/gulp" ]; then
+  npm install
+fi
+
+if [ ! -f "libraries/susy" ]; then
+  bower install susy --allow-root
+fi
+
+if [ ! -f "libraries/breakpoint-sass" ]; then
+  bower install breakpoint-sass --allow-root
+fi
+
+gulp default

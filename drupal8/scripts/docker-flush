@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+clear
+
+set -eo pipefail
+
+if [ ! -f "index.php" ]; then
+  echo 'Please run this script from "drupal8" directory.'
+  exit 1;
+fi
+
+$(echo $(pwd)"/scripts/project-branch");
+
+echo 'STOP all containers...'
+docker stop $(docker ps -a -q)
+
+echo 'REMOVE all containers...'
+docker rm $(docker ps -a -q)
+
+echo 'REMOVE all IMAGES...'
+docker rmi $(docker images -q) --force

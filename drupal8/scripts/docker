@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+clear
+
+set -eo pipefail
+
+if [ ! -f "index.php" ]; then
+  echo 'Please run this script from "drupal8" directory.'
+  exit 1;
+fi
+
+$(echo $(pwd)"/scripts/project-branch");
+
+echo "Dockerizing ..."
+
+# ##############################################################################
+DOCKER=$(realpath "$(pwd)/../ci");
+DOCKER_YML="$DOCKER/docker-compose.yml";
+PROJECT="$(cat "./.project-name" | tr -d '[:space:]')";
+DOCKER_CMD="docker-compose -f ${DOCKER_YML} -p ${PROJECT}";
+
+# ##############################################################################
+project_containers=( $($DOCKER_CMD ps -q) )
+ports=( 8000 8001 8002 )
+containers=( $(docker ps -q) )
+for container in "${containers[@]}"; do :
+  for port in "${ports[@]}"; do :
+    if [[ "$(docker port "$container")" =~ "0.0.0.0:${port}" ]]; then
+      echo "Stop container $(docker stop "$container")"
+    fi
+  done
+done
+
+# ##############################################################################
+echo "Run containers for "${PROJECT}" project ..."
+
+$DOCKER_CMD up -d;
+$DOCKER_CMD exec php sh;

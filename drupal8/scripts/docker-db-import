@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+clear
+
+#set -eo pipefail
+
+if [ ! -f "index.php" ]; then
+  echo 'Please run this script from "drupal8" directory.'
+  exit 1;
+fi
+
+if [ $(pwd) = '/var/www/html' ]; then
+  echo 'Please run this script only under LOCAL enviroment.'
+  exit 1;
+fi
+
+get_path() {
+  # $1 : file path.
+  if [ -d "$(dirname "$1")" ]; then
+    echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+  fi
+}
+
+$(echo $(pwd)"/scripts/project-branch");
+
+## #############################################################################
+echo 'Reinstalling ...'
+
+DB_FILE=$(get_path "$1")
+
+if [ $# -ne 1 ]
+then
+	echo "Usage: $0 {DB_FILE}"
+	exit 1
+fi
+
+# ##############################################################################
+PROJECT="$(cat "./.project-name" | tr -d '[:space:]')";
+DOCKER=$(get_path "$(pwd)/../ci");
+DOCKER_YML="${DOCKER}/docker-compose.yml";
+DOCKER_CMD="docker-compose -f ${DOCKER_YML} -p ${PROJECT} exec php sh -c";
+
+## ##############################################################################
+echo "Drop all tables"
+$DOCKER_CMD 'drush sql-drop -y';
+
+echo "Import new DB"
+DB_TEMP_FILE=$(mktemp "${DOCKER}/dump/reinstall.XXXXXX.sql")
+if file --mime-type "$DB_FILE" | grep -q gzip$; then
+  gunzip -c $DB_FILE > $DB_TEMP_FILE;
+else
+  cat $DB_FILE > $DB_TEMP_FILE;
+fi
+
+$DOCKER_CMD "$(echo "drush sqlc < /tmp/db/$(basename "$DB_TEMP_FILE")")" > /dev/null 2>&1
+
+rm -f $DB_TEMP_FILE
+
+## #############################################################################
+echo "Clear cache tables"
+CACHE_TABLES=( $( $DOCKER_CMD "$(echo "drush sqlq \"SHOW TABLES LIKE 'cache\_%';\"")" | sed 's/\x0D$//' ) )
+TRUNCATE_CACHE_TABLES=$(printf "TRUNCATE %s; " "${CACHE_TABLES[@]}")
+$DOCKER_CMD "$(echo "drush sqlq '${TRUNCATE_CACHE_TABLES}'")" > /dev/null 2>&1
+
+## #############################################################################
+echo "Clean compiled files"
+sudo rm -fr ./sites/default/files/php
+sudo rm -fr ./sites/default/files/js
+sudo rm -fr ./sites/default/files/cs
+sudo rm -fr ./sites/default/files/languages
+sudo chmod -R -x+X ./sites/default/files
+
+## #############################################################################
+echo "CI/CD"
+echo "$(date +"%Y%m%d%H%M%S")1" > ./sites/default/hash_salt.txt
+$DOCKER_CMD 'drush rebuild && drush cim -y && drush updb -y && drush entup -y';
+echo "$(date +"%Y%m%d%H%M%S")2" > ./sites/default/hash_salt.txt
+$DOCKER_CMD "$(echo "drush sqlq '${TRUNCATE_CACHE_TABLES}'")" > /dev/null 2>&1
+$DOCKER_CMD 'drush rebuild';
+
+## #############################################################################
+echo "Re-install DB is DONE!"
+$DOCKER_CMD 'drush uli --no-browser --uid=1';
+exit 0

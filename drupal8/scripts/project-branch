@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+GIT_PATH=$(git rev-parse --git-dir)
+PROJECT_PATH=$(realpath "${GIT_PATH}/../")
+
+echo "${BRANCH_NAME}" > "${PROJECT_PATH}/drupal8/.project-branch"
+
+$(echo "cp -rf ${PROJECT_PATH}/ci/git-hooks/* ${PROJECT_PATH}/.git/hooks")

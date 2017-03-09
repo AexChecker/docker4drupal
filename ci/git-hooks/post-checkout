@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+GIT_PATH=$(git rev-parse --git-dir)
+PROJECT_PATH=$(realpath "${GIT_PATH}/../")
+
+$(echo "${PROJECT_PATH}/drupal8/scripts/project-branch");
+
+DOCKER="${PROJECT_PATH}/ci";
+DOCKER_YML="$DOCKER/docker-compose.yml";
+PROJECT="$(cat "${PROJECT_PATH}/drupal8/.project-name" | tr -d '[:space:]')";
+DOCKER_CMD="docker-compose -f ${DOCKER_YML} -p ${PROJECT} exec php sh -c";
+
+#$DOCKER_CMD 'drush rebuild' > /dev/null
+nohup $DOCKER_CMD 'drush rebuild' > /dev/null 2>&1 &
+

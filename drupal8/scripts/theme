@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+clear
+
+set -eo pipefail
+
+if [ ! -f "index.php" ]; then
+  echo 'Please run this script from "drupal8" directory.'
+  exit 1;
+fi
+
+$(echo $(pwd)"/scripts/project-branch");
+
+# ##############################################################################
+DOCKER=$(realpath "$(pwd)/../ci");
+PROJECT="$(cat "./.project-name" | tr -d '[:space:]')";
+GULP="aexchecker/gulp"
+
+if [ -z $(docker images -q "${GULP}") ]; then
+  echo "Image '${GULP}' does not exists, creating"
+  docker build -t "${GULP}" "${DOCKER}/dockerfiles/gulp"
+fi
+
+THEME_PATH="$(pwd)/themes/custom/__PUT_YOUR_THEME__";
+
+echo 'Updating components ...'
+docker run -it --rm -v ${THEME_PATH}:/app ${GULP}

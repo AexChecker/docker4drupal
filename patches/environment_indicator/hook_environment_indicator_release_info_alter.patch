@@ -1,0 +1,17 @@
+Index: environment_indicator.module
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- environment_indicator.module	(date 1487937380000)
++++ environment_indicator.module	(revision )
+@@ -184,7 +184,9 @@
+     return $items;
+   }
+   $title = $active_environment->get('name');
++  \Drupal::moduleHandler()->alter('environment_indicator_title', $title);
+   $release_info = \Drupal::state()->get('environment_indicator.current_release');
++  \Drupal::moduleHandler()->alter('environment_indicator_release_info', $release_info);
+   $title = empty($release_info) ? $title : $title . ' (' . $release_info . ')';
+   $items['environment_indicator'] += [
+     'tab' => [

@@ -1,0 +1,21 @@
+Index: core/modules/system/system.install
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/modules/system/system.install	(date 1477315737000)
++++ core/modules/system/system.install	(revision )
+@@ -243,8 +243,12 @@
+   }
+ 
+   if ($phase == 'install' || $phase == 'runtime') {
++    // Check to see if we are running under HHVM.
++    if (strpos($phpversion, 'hhvm') !== FALSE) {
++      $requirements['php_opcache']['value'] = t('Enabled by default with HHVM @hhvmversion', ['@hhvmversion' => $phpversion]);
++    }
+     // Check to see if OPcache is installed.
+-    if (!OpCodeCache::isEnabled()) {
++    elseif (!OpCodeCache::isEnabled()) {
+       $requirements['php_opcache'] = array(
+         'value' => t('Not enabled'),
+         'severity' => REQUIREMENT_WARNING,

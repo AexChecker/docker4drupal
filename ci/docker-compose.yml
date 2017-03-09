@@ -1,0 +1,58 @@
+version: "2"
+
+services:
+  mariadb:
+    image: wodby/drupal-mariadb:1.0.0
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+      MYSQL_DATABASE: __PUT_YOUR_DB_NAME__
+      MYSQL_USER: __PUT_YOUR_DB_USER__
+      MYSQL_PASSWORD: __PUT_YOUR_DB_PASS__
+    volumes:
+      - ~/.docker-runtime/__PUT_YOUR_PROJECT_NAME__/mariadb:/var/lib/mysql
+
+  php:
+    image: wodby/drupal-php:7.0-1.0.0
+    environment:
+      PHP_SITE_NAME: dev
+      PHP_HOST_NAME: localhost:8000
+      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
+      PHP_MEMORY_LIMIT: 1024
+      PHP_MAX_EXECUTION_TIME: 600
+      PHP_MAX_INPUT_TIME: 300
+      PHP_DISPLAY_ERRORS: 1
+      PHP_DISPLAY_STARTUP_ERRORS: 1
+      PHP_XDEBUG_ENABLED: 1
+      PHP_XDEBUG_AUTOSTART: 1
+      PHP_XDEBUG_MAX_NESTING_LEVEL: 512
+    volumes:
+      - ../drupal8/:/var/www/html
+      - ./dump:/tmp/db
+
+  nginx:
+    image: wodby/drupal-nginx:1.10-1.1.0
+    environment:
+      NGINX_SERVER_NAME: localhost
+      NGINX_UPSTREAM_NAME: php
+      DRUPAL_VERSION: 8
+    volumes_from:
+      - php
+    ports:
+      - "8000:80"
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: __PUT_YOUR_DB_USER__
+      PMA_PASSWORD: __PUT_YOUR_DB_PASS__
+      PHP_UPLOAD_MAX_FILESIZE: 1G
+      PHP_MAX_INPUT_VARS: 1G
+    ports:
+     - "8001:80"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8002:8025"
+

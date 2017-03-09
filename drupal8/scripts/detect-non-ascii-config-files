@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+clear
+
+set -eo pipefail
+
+if [ ! -f "index.php" ]; then
+  echo 'Please run this script from "drupal8" directory.'
+  exit 1;
+fi
+
+$(echo $(pwd)"/scripts/project-branch");
+
+if [ -d "sites/default/config" ]; then
+  grep --color='auto' -P '[^\x00-\x7f]' sites/default/config/*
+fi
+
+if [ -d "sites/default/config/en" ]; then
+  grep --color='auto' -P '[^\x00-\x7f]' sites/default/config/en*
+fi

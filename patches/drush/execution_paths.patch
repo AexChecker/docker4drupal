@@ -1,0 +1,23 @@
+Index: drush.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- drush.php	(date 1466078917000)
++++ drush.php	(revision )
+@@ -8,5 +8,14 @@
+  * @requires PHP CLI 5.4.5, or newer.
+  */
+ 
+-require __DIR__ . '/includes/preflight.inc';
++$dir = __DIR__;
++do {
++  $dir = dirname($dir);
++  if (is_dir($dir . '/vendor/drush/drush')) {
++    $dir .= '/vendor/drush/drush';
++    break;
++  }
++} while ($dir);
++
++require $dir . '/includes/preflight.inc';
+ exit(drush_main());

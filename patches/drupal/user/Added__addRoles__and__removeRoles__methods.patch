@@ -1,0 +1,63 @@
+Index: core/modules/user/src/Entity/User.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- core/modules/user/src/Entity/User.php	(revision ca1e324f05d89642b621db85ee22c832b8e593d0)
++++ core/modules/user/src/Entity/User.php	(revision )
+@@ -170,23 +170,49 @@
+ 
+   /**
+    * {@inheritdoc}
++   *
++   * @return $this
+    */
+   public function addRole($rid) {
++    return $this->addRoles(array($rid));
++  }
+ 
++  /**
++   * @param array $rids
++   *
++   * @return $this
++   */
++  public function addRoles(array $rids) {
++    foreach ($rids as $rid) {
+-    if (in_array($rid, [RoleInterface::AUTHENTICATED_ID, RoleInterface::ANONYMOUS_ID])) {
+-      throw new \InvalidArgumentException('Anonymous or authenticated role ID must not be assigned manually.');
+-    }
++      if (in_array($rid, [RoleInterface::AUTHENTICATED_ID, RoleInterface::ANONYMOUS_ID])) {
++        throw new \InvalidArgumentException('Anonymous or authenticated role ID must not be assigned manually.');
++      }
++    }
+ 
+-    $roles = $this->getRoles(TRUE);
+-    $roles[] = $rid;
++    $roles = array_merge($this->getRoles(TRUE), $rids);
+     $this->set('roles', array_unique($roles));
++
++    return $this;
+   }
+ 
+   /**
+    * {@inheritdoc}
++   *
++   * @return $this
+    */
+   public function removeRole($rid) {
+-    $this->set('roles', array_diff($this->getRoles(TRUE), array($rid)));
++    return $this->removeRoles(array($rid));
++  }
++
++  /**
++   * @param array $rids
++   *
++   * @return $this
++   */
++  public function removeRoles(array $rids) {
++    $this->set('roles', array_diff($this->getRoles(TRUE), $rids));
++
++    return $this;
+   }
+ 
+   /**

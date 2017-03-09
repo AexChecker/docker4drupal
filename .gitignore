@@ -1,0 +1,24 @@
+tmp
+docker-runtime
+docker-runtime/*
+data
+.travis.yml
+dump
+dump/*
+docker-compose.local.yml
+node_modules
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon
+Thumbs.db
+._*
+*.un~
+.sass-cache
+*.css.map
+
+# remove IDE files
+.idea
+

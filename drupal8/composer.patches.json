@@ -1,0 +1,19 @@
+{
+  "patches": {
+    "drupal/core": {
+      "#2746253: Configuration translation save triggers an undefined index notice": "https://www.drupal.org/files/issues/configuration-2746253-18.patch",
+      "#2650434: Clearing cache via UI in translated language resets config translation of field labels to default language": "https://www.drupal.org/files/issues/2650434-84.patch",
+      "Custom fix for the definistion of return value for \"UrlHelper::filterQueryParameters()\"": "../patches/drupal/core/fixed--return-value-for_UrlHelper_filterQueryParameters.patch",
+      "Custom fix for the HHVM compatibility": "../patches/drupal/system/HHVM-compatibility.patch",
+      "Custom fix for undefined index \"package\" in \"system_requirements()\"": "../patches/drupal/system/undefined_index__package__in__system_requirements__.patch",
+      "Custom fix for invalid format": "../patches/drupal/text/invalid_format.patch",
+      "Custom fix to added \"User::addRoles()\" and \"User::removeRoles()\" methods": "../patches/drupal/user/Added__addRoles__and__removeRoles__methods.patch"
+    },
+    "drush/drush": {
+      "Custom fix for running drush from deep inside directories": "../patches/drush/execution_paths.patch"
+    },
+    "drupal/environment_indicator": {
+      "Custom fix to added \"hook_environment_indicator_release_info_alter()\" hook": "../patches/environment_indicator/hook_environment_indicator_release_info_alter.patch"
+    }
+  }
+}
